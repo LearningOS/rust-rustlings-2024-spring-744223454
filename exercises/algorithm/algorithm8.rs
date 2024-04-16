@@ -54,9 +54,9 @@ impl<T> Default for Queue<T> {
 
 pub struct myStack<T>
 {
-	//TODO
 	q1:Queue<T>,
-	q2:Queue<T>
+	q2:Queue<T>,
+
 }
 impl<T> myStack<T> {
     pub fn new() -> Self {

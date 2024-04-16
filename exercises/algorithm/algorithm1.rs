@@ -69,14 +69,33 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self {
+        let mut current_a = list_a.start;
+        let mut current_b = list_b.start;
+        let mut merged_list = LinkedList::<T>::new();
+
+        while current_a.is_some() && current_b.is_some() {
+            let val_a = unsafe { current_a.unwrap().as_ref().val };
+            let val_b = unsafe { current_b.unwrap().as_ref().val };
+            if val_a < val_b {
+                merged_list.add(val_a);
+                current_a = unsafe { current_a.unwrap().as_ref().next };
+            } else {
+                merged_list.add(val_b);
+                current_b = unsafe { current_b.unwrap().as_ref().next };
+            }
         }
+        while current_a.is_some() {
+            let val_a = unsafe { current_a.unwrap().as_ref().val };
+            merged_list.add(val_a);
+            current_a = unsafe { current_a.unwrap().as_ref().next };
+        }
+        while current_b.is_some() {
+            let val_b = unsafe { current_b.unwrap().as_ref().val };
+            merged_list.add(val_b);
+            current_b = unsafe { current_b.unwrap().as_ref().next };
+        }
+        merged_list
 	}
 }
 
