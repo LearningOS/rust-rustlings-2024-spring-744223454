@@ -2,14 +2,13 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
 
 pub struct Heap<T>
 where
-    T: Default,
+    T: Default + Ord,
 {
     count: usize,
     items: Vec<T>,
@@ -18,7 +17,7 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default,
+    T: Default + Ord,
 {
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
@@ -37,7 +36,18 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        let mut idx = self.count;
+        while idx > 1 {
+            let parent_idx = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+                self.items.swap(idx, parent_idx);
+                idx = parent_idx;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +67,13 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left_idx = self.left_child_idx(idx);
+        let right_idx = self.right_child_idx(idx);
+        if right_idx > self.count || (self.comparator)(&self.items[left_idx], &self.items[right_idx]){
+            left_idx
+        } else {
+            right_idx
+        }
     }
 }
 
@@ -79,13 +94,39 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default + Ord,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.count == 0 {
+            None
+        } else {
+            let root = self.items.swap_remove(1);
+            self.count -= 1;
+            let mut idx = 1;
+            while idx * 2 <= self.count {
+                let left_idx = self.left_child_idx(idx);
+                let right_idx = self.right_child_idx(idx);
+                let mut target_idx = idx;
+
+                if left_idx <= self.count && (self.comparator)(&self.items[left_idx], &self.items[target_idx]) {
+                    target_idx = left_idx;
+                }
+
+                if right_idx <= self.count && (self.comparator)(&self.items[right_idx], &self.items[target_idx]) {
+                    target_idx = right_idx;
+                }
+
+                if target_idx != idx {
+                    self.items.swap(idx, target_idx);
+                    idx = target_idx;
+                } else {
+                    break;
+                }
+            }
+            Some(root)
+        }
     }
 }
 
